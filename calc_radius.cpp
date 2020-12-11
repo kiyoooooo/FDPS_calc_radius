@@ -40,6 +40,22 @@ public:
     }
 };
 
+class CenterOfGravity
+{
+public:
+    /*position*/
+    double x;
+    double y;
+    double z;
+    /*数えた脂質粒子の個数*/
+    int num;
+    CenterOfGravity()
+    {
+        x = y = z = 0;
+        num = 0;
+    }
+};
+
 int main(int argc, char *argv[])
 {
     std::vector<ParticleInfo> pinfo;
@@ -75,8 +91,39 @@ int main(int argc, char *argv[])
     sscanf(delete_str[0].c_str(), "'box_sx=%lf box_sy=%lf box_sz=%lf box_ex=%lf box_ey=%lf box_ez=%lf box_wt=%lf",
            &box_sx, &box_sy, &box_sz, &box_ex, &box_ey, &box_ez, &box_wt);
     //    std::cout <<std::setprecision(10)<< box_sx << " " << box_sy << " " << box_sz << " " << box_ex << " " << box_ey << " " << box_ez << " " << box_wt << std::endl;
-    std::sort(pinfo.begin(), pinfo.end());//classでオペレータを定義して利用している．
+    std::sort(pinfo.begin(), pinfo.end()); //classでオペレータを定義して利用している．
+    /*
 
+
+
+
+    ベシクルの重心を計算する．*/
+    CenterOfGravity center_vesicle;
+    for (int i = 0; i < pinfo.size(); i++)
+    {
+        if (pinfo.at(i).type != 2)
+        {
+            center_vesicle.x += pinfo.at(i).posx;
+            center_vesicle.y += pinfo.at(i).posy;
+            center_vesicle.z += pinfo.at(i).posz;
+            center_vesicle.num++;
+        }
+    }
+    center_vesicle.x/=(double)center_vesicle.num;
+    center_vesicle.y/=(double)center_vesicle.num;
+    center_vesicle.z/=(double)center_vesicle.num;
+std::cout<<center_vesicle.x<<" "<<center_vesicle.y<<" "<<center_vesicle.z<<std::endl;
+
+
+/*
+
+
+
+
+
+
+
+ファイルの出力*/
 #if 0
     /*
     
@@ -173,7 +220,7 @@ int main(int argc, char *argv[])
         }
     }
     fpo3.close();
-#endif
+
     /*
 
 
@@ -209,6 +256,7 @@ int main(int argc, char *argv[])
     writing_file0 << std::endl;
     writing_file0 << "water : lipid = " << (double)num_water / (double)num * 100.0 << " : " << (double)num_lipid / (double)num * 100.0 << std::endl;
     writing_file0.close();
+#endif
 
     return 0;
 }
