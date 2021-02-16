@@ -109,13 +109,48 @@ int main(int argc, char *argv[])
             center_vesicle.num++;
         }
     }
-    center_vesicle.x/=(double)center_vesicle.num;
-    center_vesicle.y/=(double)center_vesicle.num;
-    center_vesicle.z/=(double)center_vesicle.num;
-std::cout<<center_vesicle.x<<" "<<center_vesicle.y<<" "<<center_vesicle.z<<std::endl;
+    center_vesicle.x /= (double)center_vesicle.num;
+    center_vesicle.y /= (double)center_vesicle.num;
+    center_vesicle.z /= (double)center_vesicle.num;
+    std::cout << center_vesicle.x << " " << center_vesicle.y << " " << center_vesicle.z << std::endl;
+    /*
 
 
-/*
+
+
+
+
+
+    同系方向の粒子種を数える*/
+    class Gr
+    {
+    public:
+        double distance = 0;
+        uint32_t number_of_0 = 0;
+        uint32_t number_of_1 = 0;
+        uint32_t number_of_2 = 0;
+    };
+    /*自分で決めるパラメータ*/
+    double dr = 0.001; //同系方向の円形ボックスの厚み．この中にいくつ粒子が入っているか数える．
+    /*確定しているもの*/
+    double search_r = 0.0;
+    double r_now;
+    uint32_t num_of_gr = (uint32_t)(box_ex - box_sx) / dr + 1;
+
+    std::vector<Gr> gr_info(num_of_gr);
+    //    Gr temp_gr_info;
+    for (int i; i < pinfo.size(); i++)
+    {
+        r_now = pow(pow(pinfo.at(i).posx - center_vesicle.x, 2.0) + pow(pinfo.at(i).posy - center_vesicle.y, 2.0) + pow(pinfo.at(i).posz - center_vesicle.z, 2.0), 0.5);
+        if (pinfo.at(i).type == 0)
+            gr_info.at((uint32_t)(r_now / dr)).number_of_0++;
+        else if (pinfo.at(i).type == 1)
+            gr_info.at((uint32_t)(r_now / dr)).number_of_1++;
+        else if (pinfo.at(i).type == 2)
+            gr_info.at((uint32_t)(r_now / dr)).number_of_2++;
+    }
+//密度で割る必要あり
+    /*
 
 
 
@@ -124,62 +159,25 @@ std::cout<<center_vesicle.x<<" "<<center_vesicle.y<<" "<<center_vesicle.z<<std::
 
 
 ファイルの出力*/
-#if 0
-    /*
-    
-    
-    
-    
-    出力ファイルを生成する．*/
-    //open file
-    //pos_file
 
-    FILE *fpo0;
-    fpo0 = fopen(argv[5], "w");
-    if (fpo0 == NULL)
-    {
-        printf("ERROR_initial_pos_lipid.cdv\n");
-        return -1;
-    }
-    fprintf(fpo0, "'box_sx=%lf box_sy=%lf box_sz=%lf box_ex=%lf box_ey=%lf box_ez=%lf box_wt=%lf\n", box_sx, box_sy, box_sz, box_ex, box_ey, box_ez, box_wt);
-    for (int i = 1; i < 3; i++)
-    {
-        fprintf(fpo0, "%s \n", delete_str[i].c_str());
-    }
-    for (int i = 0; i < double_vesicle_pinfo.size(); i++)
-    {
-        fprintf(fpo0, "%d %d   %lf   %lf   %lf \n",
-                double_vesicle_pinfo.at(i).id + 1,
-                double_vesicle_pinfo.at(i).type + 1,
-                double_vesicle_pinfo.at(i).posx,
-                double_vesicle_pinfo.at(i).posy,
-                double_vesicle_pinfo.at(i).posz);
-    }
-    fclose(fpo0);
-    /*
-
-
-
-
-
-    */
     //vel_file
     FILE *fpo1;
-    fpo1 = fopen(argv[6], "w");
+    fpo1 = fopen(argv[2], "w");
     if (fpo1 == NULL)
     {
-        printf("ERROR_initial_vel_lipid.cdv\n");
+        printf("ERROR_file_output\n");
         return -1;
     }
-    for (int i = 0; i < double_vesicle_pinfo.size(); i++)
+    for (int i = 0; i < gr_info.size(); i++)
     {
-        fprintf(fpo1, "%d   %lf   %lf   %lf \n",
-                double_vesicle_pinfo.at(i).id + 1,
-                double_vesicle_pinfo.at(i).velx,
-                double_vesicle_pinfo.at(i).vely,
-                double_vesicle_pinfo.at(i).velz);
+        fprintf(fpo1, "%lf   %d   %d   %d \n",
+                dr*i,
+                gr_info.at(i).number_of_0,
+                gr_info.at(i).number_of_1,
+                gr_info.at(i).number_of_2);
     }
     fclose(fpo1);
+#if 0
     /*
 
 
