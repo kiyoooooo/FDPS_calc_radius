@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     /*確定しているもの*/
     double search_r = 0.0;
     double r_now;
-    uint32_t num_of_gr = (uint32_t)(box_ex - box_sx) / dr + 1;
+    uint32_t num_of_gr = (uint32_t)((box_ex - box_sx) / dr) + 1;
 
     std::vector<Gr> gr_info(num_of_gr);
     //    Gr temp_gr_info;
